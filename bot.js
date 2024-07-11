@@ -2,7 +2,7 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 const TelegramBot = require("node-telegram-bot-api");
 require('dotenv').config();
-
+// 使用环境变量存储 API 令牌
 const token = process.env.TELEGRAM_BOT_TOKEN;
 
 // 创建一个 Telegram 机器人实例
@@ -12,11 +12,10 @@ bot.on("polling_error", (error) =>
   console.error(`Polling error: ${error.message}`)
 );
 
-// 设置命令菜单
-bot.setMyCommands([
-  { command: "/financenews", description: "获取LaPress财经新闻" },
-  { command: "/montrealnews", description: "获取LaPress蒙特利尔新闻" },
-]);
+let cachedFinanceNews = "";
+let cachedMontrealNews = "";
+let lastFetchTime = 0;
+const cacheDuration = 10 * 60 * 1000; // 缓存时间为10分钟
 
 // 爬取财经信息的函数
 const fetchFinanceNews = async () => {
@@ -36,7 +35,9 @@ const fetchFinanceNews = async () => {
         news += `标题: ${title}\n链接: ${fullLink}\n摘要: ${summary}\n\n`;
       }
     });
-    return news || "没有找到财经新闻。";
+    cachedFinanceNews = news || "没有找到财经新闻。";
+    lastFetchTime = Date.now();
+    return cachedFinanceNews;
   } catch (error) {
     console.error(`无法获取页面内容: ${error}`);
     return "获取财经新闻时出错。";
@@ -60,7 +61,9 @@ const fetchGrandMontrealNews = async () => {
         news += `标题: ${title}\n链接: ${fullLink}\n摘要: ${summary}\n\n`;
       }
     });
-    return news || "没有找到蒙特利尔的新闻。";
+    cachedMontrealNews = news || "没有找到蒙特利尔的新闻。";
+    lastFetchTime = Date.now();
+    return cachedMontrealNews;
   } catch (error) {
     console.error(`无法获取页面内容: ${error}`);
     return "获取新闻时出错。";
@@ -80,32 +83,23 @@ const sendChunkedMessage = async (chatId, message) => {
 bot.on("message", async (msg) => {
   const chatId = msg.chat.id;
 
-  if (msg.text) {
-    const text = msg.text.toLowerCase();
-    if (text === "/financenews") {
-      const news = await fetchFinanceNews();
-      await sendChunkedMessage(chatId, news);
-    } else if (text === "/montrealnews") {
-      const news = await fetchGrandMontrealNews();
-      await sendChunkedMessage(chatId, news);
-    } else if (text === "/start" || text === "/help") {
-      bot.sendMessage(
-        chatId,
-        "发送 /financenews 或者 /montrealnews 以获取相关新闻。",
-        {
-          reply_markup: {
-            keyboard: [[{ text: "/financenews" }, { text: "/montrealnews" }]],
-            resize_keyboard: true,
-            one_time_keyboard: false,
-          },
-        }
-      );
-    } else {
-      bot.sendMessage(
-        chatId,
-        "发送 /financenews 或者 /montrealnews 以获取相关新闻。"
-      );
+  if (msg.text.toLowerCase() === "/financenews") {
+    const now = Date.now();
+    if (now - lastFetchTime > cacheDuration || !cachedFinanceNews) {
+      await fetchFinanceNews();
     }
+    await sendChunkedMessage(chatId, cachedFinanceNews);
+  } else if (msg.text.toLowerCase() === "/montrealnews") {
+    const now = Date.now();
+    if (now - lastFetchTime > cacheDuration || !cachedMontrealNews) {
+      await fetchGrandMontrealNews();
+    }
+    await sendChunkedMessage(chatId, cachedMontrealNews);
+  } else {
+    bot.sendMessage(
+      chatId,
+      "发送 /financenews 或者 /montrealnews 以获取相关新闻。"
+    );
   }
 });
 
