@@ -1,9 +1,11 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
 const TelegramBot = require("node-telegram-bot-api");
-require('dotenv').config();
-// 使用环境变量存储 API 令牌
+require("dotenv").config();
+
+// 使用环境变量存储 API 令牌和频道 ID
 const token = process.env.TELEGRAM_BOT_TOKEN;
+const channelId = process.env.CHANNEL_ID;
 
 // 创建一个 Telegram 机器人实例
 const bot = new TelegramBot(token, { polling: true });
@@ -87,12 +89,14 @@ bot.on("message", async (msg) => {
     const now = Date.now();
     if (now - lastFetchTime > cacheDuration || !cachedFinanceNews) {
       await fetchFinanceNews();
+      sendFinanceNewsToChannel();
     }
     await sendChunkedMessage(chatId, cachedFinanceNews);
   } else if (msg.text.toLowerCase() === "/montrealnews") {
     const now = Date.now();
     if (now - lastFetchTime > cacheDuration || !cachedMontrealNews) {
       await fetchGrandMontrealNews();
+      sendMontrealNewsToChannel();
     }
     await sendChunkedMessage(chatId, cachedMontrealNews);
   } else {
@@ -102,5 +106,24 @@ bot.on("message", async (msg) => {
     );
   }
 });
+
+// 发送财经新闻到频道的函数
+const sendFinanceNewsToChannel = async () => {
+  const now = Date.now();
+  if (now - lastFetchTime > cacheDuration || !cachedFinanceNews) {
+    await fetchFinanceNews();
+  }
+  await sendChunkedMessage(channelId, cachedFinanceNews);
+};
+
+// 发送蒙特利尔新闻到频道的函数
+const sendMontrealNewsToChannel = async () => {
+  const now = Date.now();
+  if (now - lastFetchTime > cacheDuration || !cachedMontrealNews) {
+    await fetchGrandMontrealNews();
+  }
+  await sendChunkedMessage(channelId, cachedMontrealNews);
+};
+
 
 console.log("Telegram bot is running...");
