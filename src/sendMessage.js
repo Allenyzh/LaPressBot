@@ -11,10 +11,10 @@ const sendChunkedMessageWithPhoto = async (bot, chatId, news) => {
         article.link,
         details.summary,
         details.content,
-        article.image 
+        article.image
       );
       const formattedMessage = `[${article.title}](${article.link})\n${article.time}\n\n${article.summary}\n\n[Read more](${pageUrl})`;
-      
+
       if (article.image) {
         await bot.sendPhoto(chatId, article.image, {
           caption: formattedMessage,

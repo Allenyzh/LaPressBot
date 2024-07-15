@@ -25,7 +25,7 @@ const newsUrls = {
   finance: "https://www.lapresse.ca/affaires/economie/",
   montreal: "https://www.lapresse.ca/actualites/grand-montreal/",
   faitsdivers: "https://www.lapresse.ca/actualites/justice-et-faits-divers/",
-  soccer:"https://www.lapresse.ca/sports/soccer/",
+  soccer: "https://www.lapresse.ca/sports/soccer/",
 };
 
 bot.on("message", async (msg) => {
@@ -40,7 +40,7 @@ bot.on("message", async (msg) => {
     "/financenews": "finance",
     "/montrealnews": "montreal",
     "/faitsdivers": "faitsdivers",
-    "/soccer":"soccer",
+    "/soccer": "soccer",
   };
 
   if (newsTypes[command]) {
@@ -76,5 +76,3 @@ console.log("Telegram bot is running...");
 //   }
 //   await sendChunkedMessageWithPhoto(bot, channelId, news);
 // };
-
-

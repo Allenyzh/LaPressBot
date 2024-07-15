@@ -15,10 +15,12 @@ const fetchNewsForDate = async (url, date) => {
       const summary = $(element).find("p.articleDetail__lead").text().trim();
       const time = $(element).find("time").attr("datetime");
       const formattedTime = moment(time).format("YYYY-MM-DD HH:mm");
-      const image = $(element).find("picture source[type='image/jpeg']").attr("srcset");
+      const image = $(element)
+        .find("picture source[type='image/jpeg']")
+        .attr("srcset");
       const fullLink = `${link}`;
 
-      if (title && link && moment(time).isSame(date, 'day')) {
+      if (title && link && moment(time).isSame(date, "day")) {
         news.push({
           title,
           time: formattedTime,
@@ -38,9 +40,9 @@ const fetchNewsForDate = async (url, date) => {
 const fetchNews = async (url) => {
   const today = moment().format("YYYY-MM-DD");
   let news = await fetchNewsForDate(url, today);
-  
+
   if (news.length === 0) {
-    const yesterday = moment().subtract(1, 'days').format("YYYY-MM-DD");
+    const yesterday = moment().subtract(1, "days").format("YYYY-MM-DD");
     news = await fetchNewsForDate(url, yesterday);
   }
 
