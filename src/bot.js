@@ -16,14 +16,14 @@ bot.on("polling_error", (error) =>
 
 bot.setMyCommands([
   { command: "/financenews", description: "获取财经新闻" },
-  { command: "/montrealnews", description: "获取蒙特利尔新闻" },
+  { command: "/actualitenews", description: "获取时事新闻" },
   { command: "/faitsdivers", description: "获取蒙特利尔社会新闻" },
   { command: "/soccer", description: "获取体育新闻" },
 ]);
 
 const newsUrls = {
   finance: "https://www.lapresse.ca/affaires/economie/",
-  montreal: "https://www.lapresse.ca/actualites/grand-montreal/",
+  actualites: "https://www.lapresse.ca/actualites/",
   faitsdivers: "https://www.lapresse.ca/actualites/justice-et-faits-divers/",
   soccer: "https://www.lapresse.ca/sports/soccer/",
 };
@@ -38,7 +38,7 @@ bot.on("message", async (msg) => {
   const command = msg.text.toLowerCase();
   const newsTypes = {
     "/financenews": "finance",
-    "/montrealnews": "montreal",
+    "/actualitenews": "actualites",
     "/faitsdivers": "faitsdivers",
     "/soccer": "soccer",
   };
@@ -54,7 +54,7 @@ bot.on("message", async (msg) => {
   } else {
     bot.sendMessage(
       chatId,
-      "发送 /financenews /montrealnews /faitsdivers /soccer 以获取相关新闻。"
+      "发送 /financenews /actualitenews /faitsdivers /soccer 以获取相关新闻。"
     );
   }
 });

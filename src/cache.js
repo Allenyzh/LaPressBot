@@ -1,6 +1,6 @@
 const cache = {
   finance: { news: "", lastFetchTime: 0 },
-  montreal: { news: "", lastFetchTime: 0 },
+  actualites: { news: "", lastFetchTime: 0 },
   faitsdivers: { news: "", lastFetchTime: 0 },
   soccer: { news: "", lastFetchTime: 0 },
 };
